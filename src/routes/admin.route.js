@@ -19,6 +19,14 @@ router.route('/logout')
   requireSignin,
   authMiddleware,
   adminController.logout);
+
+router.route('/updateInfo/adminId/:adminId')
+ .patch(
+  validate(adminValidation.updateAdmin),
+  requireSignin,
+  authMiddleware,
+  adminController.updateAdmin
+);
 router
   .route('/update/password/:userId')
   .put(validate(adminValidation.updatePassword),

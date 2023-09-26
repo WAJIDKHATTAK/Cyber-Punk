@@ -10,17 +10,16 @@ const register = catchAsync(async (req, res) => {
 
 const login = catchAsync(async (req, res) => {
   let body = req.body;
-  const result = await adminService.login(body);
-
-  const maxAge = 24 * 60 * 60 * 1000; // 24 hours
-  res.cookie('myCookie', result.token, { maxAge });
+  const result = await adminService.login(body,res);
   res.status(httpStatus.CREATED).send(result);
 });
 
 const logout = catchAsync(async (req ,res) => {
-  const maxAge = 1;
-  res.cookie('myCookie', '' , { maxAge});
-  res.status(httpStatus.NO_CONTENT).json()
+  res.cookie('jwt', '' , {
+    httpOnly: true,
+    expires: new Date(0),
+  });
+  res.status(httpStatus.NO_CONTENT).json({ message: 'Logged out successfully' })
 })
 const updatePassword = catchAsync(async (req, res) => {
   let body = req.body;
@@ -28,10 +27,16 @@ const updatePassword = catchAsync(async (req, res) => {
   const user = await adminService.updatePassword(body, userId);
   res.status(httpStatus.CREATED).send(user);
 });
-
+const updateAdmin = catchAsync(async (req ,res) => {
+  let adminId = req.params.adminId;
+  let body = req.body;
+  const admin = await adminService.updateAdminInfo(adminId,body);
+  res.status(httpStatus.CREATED).send(admin);
+})
 module.exports = {
   register,
   login,
   logout,
   updatePassword,
+  updateAdmin,
 };

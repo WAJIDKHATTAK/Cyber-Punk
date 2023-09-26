@@ -31,10 +31,10 @@ const adminSchema = mongoose.Schema(
         index: '2dsphere',
         required: true, // This line specifies that the `coordinates` subfield is required
       },
-      Name: {
-        type: String,
-        required: true, // This line specifies that the `Name` subfield is required
-      },
+      // Name: {
+      //   type: String,
+      //   required: true, // This line specifies that the `Name` subfield is required
+      // },
     },
     role: {
       type: String,

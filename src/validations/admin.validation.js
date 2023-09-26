@@ -35,8 +35,21 @@ const updatePassword = {
   }),
 };
 
+const updateAdmin = {
+  params: Joi.object().keys({
+    adminId: Joi.required().custom(objectId),
+  }),
+  body: Joi.object().keys({
+    phoneNo: Joi.string().allow('').optional(),
+    coordinates: Joi.array()
+      .items(Joi.number())
+      .length(2)
+      .optional(),
+  }),
+};
 module.exports = {
   login,
   register,
   updatePassword,
+  updateAdmin
 };

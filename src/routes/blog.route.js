@@ -22,7 +22,7 @@ router.route("/top-four")
 
 router.route("/")
 .post(
-      fileUpload.single("featureImage"),
+      fileUpload.single("blogImage"),
       requireSignin,
       authMiddleware,
       validate(blogValidation.createBlog),

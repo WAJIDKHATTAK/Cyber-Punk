@@ -9,15 +9,12 @@ const cookieParser = require('cookie-parser');
 const httpStatus = require('http-status');
 const config = require('./config/config');
 const morgan = require('./config/morgan');
-const { jwtStrategy } = require('./config/passport');
 const { authLimiter } = require('./middlewares/rateLimiter');
 const routes = require('./routes');
 const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
 
 const app = express();
-
-const revokedTokens = new Set();
 
 if (config.env !== 'test') {
   app.use(morgan.successHandler);
@@ -56,7 +53,9 @@ if (config.env === 'production') {
 app.use(express.static("public"));
 // v1 api routes
 app.use('/v1', routes);
-
+app.use('/',(req ,res) => {
+  res.send("<center><h2>Welcome to Cyber-Punk</h2></center>");
+})
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {
   next(new ApiError(httpStatus.NOT_FOUND, 'Not found'));

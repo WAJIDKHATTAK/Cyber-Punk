@@ -4,7 +4,6 @@ const ApiError = require('../utils/ApiError');
 const bcrypt = require('bcryptjs');
 const generateJwtToken = require('../config/generateToken');
 
-
 /**
  * Create a user
  * @param {Object} userBody
@@ -18,8 +17,10 @@ const register = async (userBody) => {
   }
 };
 
-const login = async (userBody) => {
-  const user = await Admin.findOne({ email: userBody.email });
+const login = async (userBody,res) => {
+  const user = await Admin.findOne({ email: userBody.email })
+  .select('-role -location');
+
   if (!user) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Credentials invalid');
   }
@@ -27,9 +28,12 @@ const login = async (userBody) => {
   if (!checkPassword) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Credentials invalid');
   }
-
-  const token = generateJwtToken(user._id, 'admin');
-  const result = { token, user };
+  const userForResponse = {
+    _id: user._id,
+    email: user.email,
+    };
+  const token = await generateJwtToken(res,user._id, 'admin');
+  const result = { token, userForResponse };
   return result;
 };
 
@@ -51,9 +55,30 @@ const updatePassword = async (body, userId) => {
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, error);
   }
 };
+const updateAdminInfo = async (adminId, userBody) => {
+  try {
+    const updateFields = {};
+    if (userBody.phoneNo !== undefined) {
+      updateFields.phoneNo = userBody.phoneNo;
+    }
 
+    if (userBody.coordinates !== undefined) {
+      updateFields['location.coordinates'] = userBody.coordinates;
+    }
+    const admin = await Admin.findByIdAndUpdate(adminId, {
+      $set: updateFields,
+    });
+    if (!admin) {
+      throw new Error('Admin not found');
+    }
+    return admin;
+  } catch (error) {
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, error);
+  }
+};
 module.exports = {
   register,
   login,
   updatePassword,
+  updateAdminInfo,
 };
